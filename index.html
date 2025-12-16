@@ -7,10 +7,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    :root{ --ink:#0f172a; --bg:#f8fafc; }
+    :root{
+      --ink:#0f172a;
+      --bg:#f8fafc;
+    }
     body{ background:var(--bg); }
 
-    /* Central line segmented by month via gradient */
+    /* Línea central segmentada por mes */
     .center-line{
       position:absolute;
       left:50%;
@@ -23,7 +26,7 @@
       box-shadow:0 2px 8px rgba(15,23,42,.12);
     }
 
-    /* Circle marker */
+    /* Punto */
     .dot{
       width:18px;
       height:18px;
@@ -32,16 +35,16 @@
       box-shadow:0 2px 10px rgba(15,23,42,.15);
     }
 
-    /* Force left/right with a 3-col grid per row */
+    /* Layout por fila: izquierda | centro | derecha */
     .item{
       position:relative;
       display:grid;
-      grid-template-columns: 1fr auto 1fr; /* left | center | right */
+      grid-template-columns: 1fr auto 1fr;
       align-items:center;
       padding:18px 0;
     }
 
-    /* Content blocks */
+    /* Tarjeta */
     .card{
       max-width: 560px;
       background:white;
@@ -52,35 +55,39 @@
       line-height:1.25;
     }
 
-    /* Separation from centered dot */
+    /* Separación (1 cm) del punto */
     .left-card{
-      grid-column:1;
-      justify-self:end;
-      margin-right:1cm;
+      grid-column: 1;
+      justify-self: end;
+      margin-right: 1cm;
     }
     .right-card{
-      grid-column:3;
-      justify-self:start;
-      margin-left:1cm;
+      grid-column: 3;
+      justify-self: start;
+      margin-left: 1cm;
     }
 
-    /* Center dot always in the middle column */
+    /* Punto centrado */
     .dot-wrap{
-      grid-column:2;
-      justify-self:center;
-      z-index:10;
+      grid-column: 2;
+      justify-self: center;
+      z-index: 10;
     }
 
-    /* Responsive: stack content on the right of the line */
+    /* Detalles */
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display:none; }
+
+    /* Móvil: apila a la derecha de la línea */
     @media (max-width: 768px){
       .center-line{ left:20px; transform:none; }
-      .item{ grid-template-columns:auto 1fr; column-gap:14px; }
+      .item{ grid-template-columns: auto 1fr; column-gap:14px; }
       .dot-wrap{ grid-column:1; }
       .left-card, .right-card{
         grid-column:2;
         justify-self:start;
         margin:0;
-        max-width:calc(100vw - 92px);
+        max-width: calc(100vw - 92px);
       }
     }
   </style>
@@ -119,7 +126,7 @@
     </div>
 
     <footer class="mt-10 text-xs text-slate-500">
-      Para editar eventos, busca el arreglo <code class="px-1 py-0.5 rounded bg-slate-100">events</code> dentro del archivo.
+      Para editar eventos, modifica el arreglo <code class="px-1 py-0.5 rounded bg-slate-100">events</code>.
     </footer>
   </main>
 
@@ -127,67 +134,66 @@
     // Meses en español (abreviados)
     const monthsEs = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 
-    // Colores por mes
+    // Colores por mes (puedes cambiar a paleta institucional)
     const monthColors = {
       1:"#1f77b4", 2:"#aec7e8", 3:"#ff7f0e", 4:"#ffbb78",
       5:"#2ca02c", 6:"#98df8a", 7:"#d62728", 8:"#ff9896",
       9:"#9467bd", 10:"#c5b0d5", 11:"#8c564b", 12:"#c49c94"
     };
 
-    // === Eventos completos (2026) ===
-    // type: "Electoral" (izquierda) | "Institucional" (derecha / misional)
+    // Eventos 2026 (con áreas responsables)
     const events = [
-      { date:"2026-01-03", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del PIDESC" },
-      { date:"2026-01-05", type:"Institucional", title:"Posesión de Vicedefensora" },
-      { date:"2026-01-16", type:"Institucional", title:"Presentación de Informe Catatumbo" },
-      { date:"2026-01-30", type:"Institucional", title:"Inicio de Seminario sobre Metodología de la Investigación" },
-      { date:"2026-01-31", type:"Electoral", title:"Inicio de campaña electoral e inscripción de candidatos" },
+      { date:"2026-01-03", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del PIDESC", areas:["Vicedefensoría","Delegada de DDHH"] },
+      { date:"2026-01-05", type:"Institucional", title:"Posesión de Vicedefensora", areas:["Despacho Defensorial","Secretaría General"] },
+      { date:"2026-01-16", type:"Institucional", title:"Presentación de Informe Catatumbo", areas:["Delegada para la Conflictividad Social","Dirección de Análisis"] },
+      { date:"2026-01-30", type:"Institucional", title:"Inicio de Seminario sobre Metodología de la Investigación", areas:["Vicedefensoría","Dirección de Investigaciones"] },
+      { date:"2026-01-31", type:"Electoral", title:"Inicio de campaña electoral e inscripción de candidatos", areas:["Delegada para Asuntos Electorales"] },
 
-      { date:"2026-02-15", type:"Institucional", title:"Lanzamiento Resolución Defensorial de Recomendaciones a Candidatos" },
-      { date:"2026-02-15", type:"Institucional", title:"Primera Sesión de CADHPAZ" },
-      { date:"2026-02-24", type:"Institucional", title:"Conferencia Internacional sobre Reforma Agraria y Desarrollo Rural" },
-      { date:"2026-02-28", type:"Institucional", title:"Cierre Conferencia Internacional sobre Reforma Agraria y Desarrollo Rural" },
-      { date:"2026-02-28", type:"Electoral", title:"Inicio de propaganda electoral en prensa y radio" },
-      { date:"2026-02-28", type:"Electoral", title:"Publicación del censo electoral" },
+      { date:"2026-02-15", type:"Institucional", title:"Lanzamiento Resolución Defensorial de Recomendaciones a Candidatos", areas:["Despacho Defensorial","Delegada Electoral"] },
+      { date:"2026-02-15", type:"Institucional", title:"Primera Sesión de CADHPAZ", areas:["Vicedefensoría","Delegada de Paz"] },
+      { date:"2026-02-24", type:"Institucional", title:"Conferencia Internacional sobre Reforma Agraria y Desarrollo Rural", areas:["Delegada Rural","Relaciones Internacionales"] },
+      { date:"2026-02-28", type:"Institucional", title:"Cierre Conferencia Internacional sobre Reforma Agraria y Desarrollo Rural", areas:["Delegada Rural"] },
+      { date:"2026-02-28", type:"Electoral", title:"Inicio de propaganda electoral en prensa y radio", areas:["Delegada Electoral"] },
+      { date:"2026-02-28", type:"Electoral", title:"Publicación del censo electoral", areas:["Registraduría / Seguimiento Electoral"] },
 
-      { date:"2026-03-01", type:"Institucional", title:"Primera Audiencia Defensorial" },
-      { date:"2026-03-13", type:"Electoral", title:"Cierre del periodo de inscripción de candidaturas" },
-      { date:"2026-03-20", type:"Electoral", title:"Cierre de modificaciones a inscripción de candidatos" },
-      { date:"2026-03-22", type:"Electoral", title:"Publicación de candidatos aceptados" },
-      { date:"2026-03-23", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del Pacto de Derechos Civiles y Políticos" },
-      { date:"2026-03-31", type:"Electoral", title:"Cierre de inscripción de ciudadanos (nacional y exterior)" },
+      { date:"2026-03-01", type:"Institucional", title:"Primera Audiencia Defensorial", areas:["Vicedefensoría","Delegadas Regionales"] },
+      { date:"2026-03-13", type:"Electoral", title:"Cierre del periodo de inscripción de candidaturas", areas:["Delegada Electoral"] },
+      { date:"2026-03-20", type:"Electoral", title:"Cierre de modificaciones a inscripción de candidatos", areas:["Delegada Electoral"] },
+      { date:"2026-03-22", type:"Electoral", title:"Publicación de candidatos aceptados", areas:["Delegada Electoral"] },
+      { date:"2026-03-23", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del Pacto de Derechos Civiles y Políticos", areas:["Delegada de DDHH","Cooperación Internacional"] },
+      { date:"2026-03-31", type:"Electoral", title:"Cierre de inscripción de ciudadanos (nacional y exterior)", areas:["Delegada Electoral"] },
 
-      { date:"2026-04-01", type:"Institucional", title:"Quinto aniversario del estallido social (inicio de conmemoraciones)" },
-      { date:"2026-04-15", type:"Institucional", title:"Segunda Sesión de CADHPAZ" },
-      { date:"2026-04-16", type:"Electoral", title:"Conformación de delegados del CNE e inicio de contratación en TV" },
+      { date:"2026-04-01", type:"Institucional", title:"Quinto aniversario del estallido social (inicio de conmemoraciones)", areas:["Vicedefensoría","Delegada de DDHH"] },
+      { date:"2026-04-15", type:"Institucional", title:"Segunda Sesión de CADHPAZ", areas:["Vicedefensoría","Delegada de Paz"] },
+      { date:"2026-04-16", type:"Electoral", title:"Conformación de delegados del CNE e inicio de contratación en TV", areas:["Delegada Electoral"] },
 
-      { date:"2026-05-21", type:"Electoral", title:"Publicación de jurados de votación" },
-      { date:"2026-05-25", type:"Electoral", title:"Inicio del periodo de votación en el exterior" },
-      { date:"2026-05-29", type:"Electoral", title:"Fecha límite de postulación de testigos electorales" },
-      { date:"2026-05-31", type:"Electoral", title:"Día de la elección" },
+      { date:"2026-05-21", type:"Electoral", title:"Publicación de jurados de votación", areas:["Delegada Electoral"] },
+      { date:"2026-05-25", type:"Electoral", title:"Inicio del periodo de votación en el exterior", areas:["Delegada Electoral"] },
+      { date:"2026-05-29", type:"Electoral", title:"Fecha límite de postulación de testigos electorales", areas:["Delegada Electoral"] },
+      { date:"2026-05-31", type:"Electoral", title:"Día de la elección", areas:["Delegada Electoral","PMU Electoral"] },
 
-      { date:"2026-06-01", type:"Institucional", title:"Segunda Audiencia Defensorial" },
-      { date:"2026-06-01", type:"Institucional", title:"Segunda Sesión Presencial del Consejo Asesor" },
-      { date:"2026-06-08", type:"Institucional", title:"Visita de la CIDH en el marco del quinto aniversario del estallido social" },
-      { date:"2026-06-10", type:"Institucional", title:"Aniversario 15 de la Ley de Víctimas" },
-      { date:"2026-06-15", type:"Institucional", title:"Tercera Sesión de CADHPAZ" },
-      { date:"2026-06-20", type:"Institucional", title:"Audiencia de rendición de cuentas 2025" },
-      { date:"2026-06-21", type:"Electoral", title:"Posible segunda vuelta presidencial" },
+      { date:"2026-06-01", type:"Institucional", title:"Segunda Audiencia Defensorial", areas:["Vicedefensoría","Delegadas Regionales"] },
+      { date:"2026-06-01", type:"Institucional", title:"Segunda Sesión Presencial del Consejo Asesor", areas:["Despacho Defensorial","Consejo Asesor"] },
+      { date:"2026-06-08", type:"Institucional", title:"Visita de la CIDH en el marco del quinto aniversario del estallido social", areas:["Relaciones Internacionales","Delegada de DDHH"] },
+      { date:"2026-06-10", type:"Institucional", title:"Aniversario 15 de la Ley de Víctimas", areas:["Delegada de Víctimas"] },
+      { date:"2026-06-15", type:"Institucional", title:"Tercera Sesión de CADHPAZ", areas:["Vicedefensoría","Delegada de Paz"] },
+      { date:"2026-06-20", type:"Institucional", title:"Audiencia de rendición de cuentas 2025", areas:["Despacho Defensorial","Planeación"] },
+      { date:"2026-06-21", type:"Electoral", title:"Posible segunda vuelta presidencial", areas:["Delegada Electoral"] },
 
-      { date:"2026-07-15", type:"Institucional", title:"Finalización del Mandato de la Comisión de Evaluación de la Justicia – San José de Apartadó" },
+      { date:"2026-07-15", type:"Institucional", title:"Finalización del Mandato de la Comisión de Evaluación de la Justicia – San José de Apartadó", areas:["Delegada de Justicia"] },
 
-      { date:"2026-08-03", type:"Institucional", title:"Tercera Sesión Presencial del Consejo Asesor" },
-      { date:"2026-08-15", type:"Institucional", title:"Cuarta Sesión de CADHPAZ" },
+      { date:"2026-08-03", type:"Institucional", title:"Tercera Sesión Presencial del Consejo Asesor", areas:["Consejo Asesor"] },
+      { date:"2026-08-15", type:"Institucional", title:"Cuarta Sesión de CADHPAZ", areas:["Vicedefensoría","Delegada de Paz"] },
 
-      { date:"2026-09-01", type:"Institucional", title:"Tercera Audiencia Defensorial" },
-      { date:"2026-09-09", type:"Institucional", title:"Día Nacional de los Derechos Humanos" },
+      { date:"2026-09-01", type:"Institucional", title:"Tercera Audiencia Defensorial", areas:["Vicedefensoría","Delegadas Regionales"] },
+      { date:"2026-09-09", type:"Institucional", title:"Día Nacional de los Derechos Humanos", areas:["Delegada de DDHH"] },
 
-      { date:"2026-11-02", type:"Institucional", title:"Cuarta Sesión Presencial del Consejo Asesor" },
-      { date:"2026-11-24", type:"Institucional", title:"Aniversario del Acuerdo Final para la Paz" },
+      { date:"2026-11-02", type:"Institucional", title:"Cuarta Sesión Presencial del Consejo Asesor", areas:["Consejo Asesor"] },
+      { date:"2026-11-24", type:"Institucional", title:"Aniversario del Acuerdo Final para la Paz", areas:["Delegada de Paz"] },
 
-      { date:"2026-12-01", type:"Institucional", title:"Cuarta Audiencia Defensorial" },
-      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del Pacto de Derechos Civiles y Políticos" },
-      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del PIDESC" },
+      { date:"2026-12-01", type:"Institucional", title:"Cuarta Audiencia Defensorial", areas:["Vicedefensoría"] },
+      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del Pacto de Derechos Civiles y Políticos", areas:["Delegada de DDHH"] },
+      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del PIDESC", areas:["Delegada de DDHH"] },
     ];
 
     const pad2 = (n)=> String(n).padStart(2,'0');
@@ -206,15 +212,13 @@
     }
 
     function formatShortES(d){
-      const dd = pad2(d.getDate());
-      const mm = monthsEs[d.getMonth()];
-      return `${dd} ${mm}`;
+      return `${pad2(d.getDate())} ${monthsEs[d.getMonth()]}`;
     }
 
     function render(){
       const q = document.getElementById('search').value.trim().toLowerCase();
       const showElectoral = document.getElementById('chk-electoral').checked;
-      const showMisional = document.getElementById('chk-misional').checked;
+      const showMisional  = document.getElementById('chk-misional').checked;
 
       const items = document.getElementById('items');
       items.innerHTML = '';
@@ -226,7 +230,7 @@
           if(e.type === 'Electoral' && !showElectoral) return false;
           if(e.type !== 'Electoral' && !showMisional) return false;
           if(!q) return true;
-          return (`${e.title} ${e.type} ${e.date}`).toLowerCase().includes(q);
+          return (`${e.title} ${e.type} ${(e.areas||[]).join(' ')} ${e.date}`).toLowerCase().includes(q);
         });
 
       if(filtered.length === 0){
@@ -243,6 +247,7 @@
         const row = document.createElement('div');
         row.className = 'item';
 
+        // Dot
         const dotWrap = document.createElement('div');
         dotWrap.className = 'dot-wrap';
         const dot = document.createElement('div');
@@ -250,6 +255,7 @@
         dot.style.background = monthColors[month];
         dotWrap.appendChild(dot);
 
+        // Card
         const card = document.createElement('div');
         card.className = 'card';
 
@@ -281,8 +287,36 @@
         title.style.overflow = 'hidden';
         title.textContent = e.title;
 
+        // Desplegable de áreas responsables
+        const details = document.createElement('details');
+        details.className = 'mt-2';
+
+        const summary = document.createElement('summary');
+        summary.className = 'cursor-pointer text-sm text-slate-600 hover:text-slate-800 flex items-center gap-2';
+        summary.innerHTML = `<span class="text-slate-500">▶</span><span>Áreas responsables</span>`;
+
+        // Cambiar icono ▶/▼
+        details.addEventListener('toggle', () => {
+          const icon = summary.querySelector('span');
+          if(icon) icon.textContent = details.open ? '▼' : '▶';
+        });
+
+        const list = document.createElement('ul');
+        list.className = 'mt-1 ml-5 list-disc text-sm text-slate-700';
+
+        const areas = (Array.isArray(e.areas) && e.areas.length) ? e.areas : ["Por definir"];
+        areas.forEach(a => {
+          const li = document.createElement('li');
+          li.textContent = a;
+          list.appendChild(li);
+        });
+
+        details.appendChild(summary);
+        details.appendChild(list);
+
         card.appendChild(top);
         card.appendChild(title);
+        card.appendChild(details);
 
         row.appendChild(dotWrap);
         row.appendChild(card);
