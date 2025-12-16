@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Línea de tiempo 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root{ --ink:#0f172a; --bg:#f8fafc; }
+    body{ background:var(--bg); }
+
+    /* Central line segmented by month via gradient */
+    .center-line{
+      position:absolute;
+      left:50%;
+      top:0;
+      bottom:0;
+      width:10px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      overflow:hidden;
+      box-shadow:0 2px 8px rgba(15,23,42,.12);
+    }
+
+    /* Circle marker */
+    .dot{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:3px solid rgba(255,255,255,.92);
+      box-shadow:0 2px 10px rgba(15,23,42,.15);
+    }
+
+    /* Force left/right with a 3-col grid per row */
+    .item{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1fr auto 1fr; /* left | center | right */
+      align-items:center;
+      padding:18px 0;
+    }
+
+    /* Content blocks */
+    .card{
+      max-width: 560px;
+      background:white;
+      border:1px solid rgba(148,163,184,.45);
+      border-radius:14px;
+      padding:14px 16px;
+      box-shadow:0 6px 18px rgba(15,23,42,.06);
+      line-height:1.25;
+    }
+
+    /* Separation from centered dot */
+    .left-card{
+      grid-column:1;
+      justify-self:end;
+      margin-right:1cm;
+    }
+    .right-card{
+      grid-column:3;
+      justify-self:start;
+      margin-left:1cm;
+    }
+
+    /* Center dot always in the middle column */
+    .dot-wrap{
+      grid-column:2;
+      justify-self:center;
+      z-index:10;
+    }
+
+    /* Responsive: stack content on the right of the line */
+    @media (max-width: 768px){
+      .center-line{ left:20px; transform:none; }
+      .item{ grid-template-columns:auto 1fr; column-gap:14px; }
+      .dot-wrap{ grid-column:1; }
+      .left-card, .right-card{
+        grid-column:2;
+        justify-self:start;
+        margin:0;
+        max-width:calc(100vw - 92px);
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <header class="sticky top-0 z-20 backdrop-blur bg-white/70 border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold" style="color:var(--ink)">Línea de tiempo 2026</h1>
+        <p class="text-slate-600">Izquierda: Electoral · Derecha: Misional</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+        <input id="search" type="search" placeholder="Buscar (ej. CADHPAZ, Audiencia, CIDH…)"
+               class="w-full sm:w-80 px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-slate-300" />
+
+        <div class="flex gap-2">
+          <label class="flex items-center gap-2 text-sm px-3 py-2 rounded-xl border border-slate-300 bg-white">
+            <input id="chk-electoral" type="checkbox" class="accent-slate-700" checked />
+            Electoral
+          </label>
+          <label class="flex items-center gap-2 text-sm px-3 py-2 rounded-xl border border-slate-300 bg-white">
+            <input id="chk-misional" type="checkbox" class="accent-slate-700" checked />
+            Misional
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <div class="relative">
+      <div id="centerLine" class="center-line"></div>
+      <div id="items" class="relative"></div>
+    </div>
+
+    <footer class="mt-10 text-xs text-slate-500">
+      Para editar eventos, busca el arreglo <code class="px-1 py-0.5 rounded bg-slate-100">events</code> dentro del archivo.
+    </footer>
+  </main>
+
+  <script>
+    // Meses en español (abreviados)
+    const monthsEs = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+
+    // Colores por mes
+    const monthColors = {
+      1:"#1f77b4", 2:"#aec7e8", 3:"#ff7f0e", 4:"#ffbb78",
+      5:"#2ca02c", 6:"#98df8a", 7:"#d62728", 8:"#ff9896",
+      9:"#9467bd", 10:"#c5b0d5", 11:"#8c564b", 12:"#c49c94"
+    };
+
+    // === Eventos completos (2026) ===
+    // type: "Electoral" (izquierda) | "Institucional" (derecha / misional)
+    const events = [
+      { date:"2026-01-03", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del PIDESC" },
+      { date:"2026-01-05", type:"Institucional", title:"Posesión de Vicedefensora" },
+      { date:"2026-01-16", type:"Institucional", title:"Presentación de Informe Catatumbo" },
+      { date:"2026-01-30", type:"Institucional", title:"Inicio de Seminario sobre Metodología de la Investigación" },
+      { date:"2026-01-31", type:"Electoral", title:"Inicio de campaña electoral e inscripción de candidatos" },
+
+      { date:"2026-02-15", type:"Institucional", title:"Lanzamiento Resolución Defensorial de Recomendaciones a Candidatos" },
+      { date:"2026-02-15", type:"Institucional", title:"Primera Sesión de CADHPAZ" },
+      { date:"2026-02-20", type:"Institucional", title:"Cierre Primera Sesión de CADHPAZ" },
+      { date:"2026-02-24", type:"Institucional", title:"Conferencia Internacional sobre Reforma Agraria y Desarrollo Rural" },
+      { date:"2026-02-28", type:"Institucional", title:"Cierre Conferencia Internacional sobre Reforma Agraria y Desarrollo Rural" },
+      { date:"2026-02-28", type:"Electoral", title:"Inicio de propaganda electoral en prensa y radio" },
+      { date:"2026-02-28", type:"Electoral", title:"Publicación del censo electoral" },
+
+      { date:"2026-03-01", type:"Institucional", title:"Primera Audiencia Defensorial" },
+      { date:"2026-03-13", type:"Electoral", title:"Cierre del periodo de inscripción de candidaturas" },
+      { date:"2026-03-20", type:"Electoral", title:"Cierre de modificaciones a inscripción de candidatos" },
+      { date:"2026-03-22", type:"Electoral", title:"Publicación de candidatos aceptados" },
+      { date:"2026-03-23", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del Pacto de Derechos Civiles y Políticos" },
+      { date:"2026-03-31", type:"Electoral", title:"Cierre de inscripción de ciudadanos (nacional y exterior)" },
+
+      { date:"2026-04-01", type:"Institucional", title:"Quinto aniversario del estallido social (inicio de conmemoraciones)" },
+      { date:"2026-04-15", type:"Institucional", title:"Segunda Sesión de CADHPAZ" },
+      { date:"2026-04-16", type:"Electoral", title:"Conformación de delegados del CNE e inicio de contratación en TV" },
+      { date:"2026-04-20", type:"Institucional", title:"Cierre Segunda Sesión de CADHPAZ" },
+
+      { date:"2026-05-21", type:"Electoral", title:"Publicación de jurados de votación" },
+      { date:"2026-05-25", type:"Electoral", title:"Inicio del periodo de votación en el exterior" },
+      { date:"2026-05-29", type:"Electoral", title:"Fecha límite de postulación de testigos electorales" },
+      { date:"2026-05-31", type:"Electoral", title:"Día de la elección" },
+
+      { date:"2026-06-01", type:"Institucional", title:"Segunda Audiencia Defensorial" },
+      { date:"2026-06-01", type:"Institucional", title:"Segunda Sesión Presencial del Consejo Asesor" },
+      { date:"2026-06-08", type:"Institucional", title:"Visita de la CIDH en el marco del quinto aniversario del estallido social" },
+      { date:"2026-06-10", type:"Institucional", title:"Aniversario 15 de la Ley de Víctimas" },
+      { date:"2026-06-15", type:"Institucional", title:"Tercera Sesión de CADHPAZ" },
+      { date:"2026-06-20", type:"Institucional", title:"Audiencia de rendición de cuentas 2025" },
+      { date:"2026-06-21", type:"Electoral", title:"Posible segunda vuelta presidencial" },
+
+      { date:"2026-07-15", type:"Institucional", title:"Finalización del Mandato de la Comisión de Evaluación de la Justicia – San José de Apartadó" },
+
+      { date:"2026-08-03", type:"Institucional", title:"Tercera Sesión Presencial del Consejo Asesor" },
+      { date:"2026-08-07", type:"Institucional", title:"Cierre Tercera Sesión Presencial del Consejo Asesor" },
+      { date:"2026-08-15", type:"Institucional", title:"Cuarta Sesión de CADHPAZ" },
+      { date:"2026-08-20", type:"Institucional", title:"Cierre Cuarta Sesión de CADHPAZ" },
+
+      { date:"2026-09-01", type:"Institucional", title:"Tercera Audiencia Defensorial" },
+      { date:"2026-09-09", type:"Institucional", title:"Día Nacional de los Derechos Humanos" },
+
+      { date:"2026-11-02", type:"Institucional", title:"Cuarta Sesión Presencial del Consejo Asesor" },
+      { date:"2026-11-06", type:"Institucional", title:"Cierre Cuarta Sesión Presencial del Consejo Asesor" },
+      { date:"2026-11-24", type:"Institucional", title:"Aniversario del Acuerdo Final para la Paz" },
+
+      { date:"2026-12-01", type:"Institucional", title:"Cuarta Audiencia Defensorial" },
+      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del Pacto de Derechos Civiles y Políticos" },
+      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del PIDESC" },
+    ];
+
+    const pad2 = (n)=> String(n).padStart(2,'0');
+    const parseDate = (s)=> { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+
+    function setCenterLineGradient(){
+      const stops = [];
+      const seg = 100/12;
+      for(let m=1; m<=12; m++){
+        const c = monthColors[m];
+        const a = (m-1)*seg;
+        const b = m*seg;
+        stops.push(`${c} ${a.toFixed(4)}%`, `${c} ${b.toFixed(4)}%`);
+      }
+      document.getElementById('centerLine').style.background = `linear-gradient(to bottom, ${stops.join(',')})`;
+    }
+
+    function formatShortES(d){
+      const dd = pad2(d.getDate());
+      const mm = monthsEs[d.getMonth()];
+      return `${dd} ${mm}`;
+    }
+
+    function render(){
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const showElectoral = document.getElementById('chk-electoral').checked;
+      const showMisional = document.getElementById('chk-misional').checked;
+
+      const items = document.getElementById('items');
+      items.innerHTML = '';
+
+      const filtered = events
+        .map(e => ({...e, d: parseDate(e.date)}))
+        .sort((a,b)=> a.d - b.d)
+        .filter(e => {
+          if(e.type === 'Electoral' && !showElectoral) return false;
+          if(e.type !== 'Electoral' && !showMisional) return false;
+          if(!q) return true;
+          return (`${e.title} ${e.type} ${e.date}`).toLowerCase().includes(q);
+        });
+
+      if(filtered.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'py-14 text-center text-slate-500';
+        empty.textContent = 'No hay resultados con ese filtro/búsqueda.';
+        items.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach((e) => {
+        const month = e.d.getMonth()+1;
+
+        const row = document.createElement('div');
+        row.className = 'item';
+
+        const dotWrap = document.createElement('div');
+        dotWrap.className = 'dot-wrap';
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.style.background = monthColors[month];
+        dotWrap.appendChild(dot);
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        // Izquierda: Electoral | Derecha: Misional
+        const side = (e.type === 'Electoral') ? 'left' : 'right';
+        card.classList.add(side === 'left' ? 'left-card' : 'right-card');
+
+        const top = document.createElement('div');
+        top.className = 'flex items-center justify-between gap-2';
+
+        const date = document.createElement('div');
+        date.className = 'font-bold text-slate-800';
+        date.textContent = formatShortES(e.d);
+
+        const tag = document.createElement('span');
+        tag.className = 'text-xs px-2 py-1 rounded-full border';
+        tag.textContent = (e.type === 'Electoral') ? 'Electoral' : 'Misional';
+        tag.style.borderColor = 'rgba(148,163,184,.7)';
+        tag.style.color = '#334155';
+
+        top.appendChild(date);
+        top.appendChild(tag);
+
+        const title = document.createElement('div');
+        title.className = 'mt-1 text-slate-700';
+        title.style.display = '-webkit-box';
+        title.style.webkitBoxOrient = 'vertical';
+        title.style.webkitLineClamp = '2';
+        title.style.overflow = 'hidden';
+        title.textContent = e.title;
+
+        card.appendChild(top);
+        card.appendChild(title);
+
+        row.appendChild(dotWrap);
+        row.appendChild(card);
+        items.appendChild(row);
+      });
+    }
+
+    setCenterLineGradient();
+    render();
+
+    document.getElementById('search').addEventListener('input', render);
+    document.getElementById('chk-electoral').addEventListener('change', render);
+    document.getElementById('chk-misional').addEventListener('change', render);
+  </script>
+</body>
+</html>
