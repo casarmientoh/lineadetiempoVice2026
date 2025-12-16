@@ -10,6 +10,7 @@
     :root{
       --ink:#0f172a;
       --bg:#f8fafc;
+      --lila:#a855f7; /* purple-500 */
     }
     body{ background:var(--bg); }
 
@@ -138,7 +139,7 @@
     const monthColors = {
       1:"#1f77b4", 2:"#aec7e8", 3:"#ff7f0e", 4:"#ffbb78",
       5:"#2ca02c", 6:"#98df8a", 7:"#d62728", 8:"#ff9896",
-      9:"#9467bd", 10:"#aec7e8", 11:"#8c564b", 12:"#c49c94"
+      9:"#9467bd", 10:"#c5b0d5", 11:"#8c564b", 12:"#c49c94"
     };
 
     // Eventos 2026 (con áreas responsables)
@@ -168,7 +169,7 @@
       { date:"2026-04-16", type:"Electoral", title:"Conformación de delegados del CNE e inicio de contratación en TV", areas:["DNATQ"] },
       { date:"2026-04-30", type:"Institucional", title:"Ruta Defensorial para retención de miembros FFMM", areas:["Vicedefensoría"] },
       { date:"2026-04-30", type:"Institucional", title:"Ruta Defensorial MAP/MUSE", areas:["Vicedefensoría"] },
-      
+
       { date:"2026-05-21", type:"Electoral", title:"Publicación de jurados de votación", areas:["DNATQ"] },
       { date:"2026-05-25", type:"Electoral", title:"Inicio del periodo de votación en el exterior", areas:["DNATQ"] },
       { date:"2026-05-29", type:"Electoral", title:"Fecha límite de postulación de testigos electorales", areas:["DNATQ"] },
@@ -176,10 +177,10 @@
 
       { date:"2026-06-01", type:"Institucional", title:"Segunda Audiencia Defensorial", areas:["Defensora","Vicedefensoría"] },
       { date:"2026-06-01", type:"Institucional", title:"Segunda Sesión Presencial del Consejo Asesor", areas:["Defensora","Vicedefensoría"] },
-      { date:"2026-06-04", type:"Institucional", title:"Día Nacional del Campesinado", areas:["Delegada Asuntos Agrarios","DNPD"] },      
+      { date:"2026-06-04", type:"Institucional", title:"Día Nacional del Campesinado", areas:["Delegada Asuntos Agrarios","DNPD"] },
       { date:"2026-06-08", type:"Institucional", title:"Visita de la CIDH en el marco del quinto aniversario del estallido social", areas:["Vicedefensoría","OAI"] },
       { date:"2026-06-10", type:"Institucional", title:"Aniversario 15 de la Ley de Víctimas", areas:["Vicedefensoría","Delegada de Víctimas"] },
-      { date:"2026-06-15", type:"Institucional", title:"Tercera Sesión de CADHPAZ", areas:["Defensora","Vicedefensoría",] },
+      { date:"2026-06-15", type:"Institucional", title:"Tercera Sesión de CADHPAZ", areas:["Defensora","Vicedefensoría"] },
       { date:"2026-06-20", type:"Institucional", title:"Audiencia de rendición de cuentas 2025", areas:["Defensora","Vicedefensoría","Planeación"] },
       { date:"2026-06-21", type:"Electoral", title:"Posible segunda vuelta presidencial", areas:["DNATQ"] },
 
@@ -193,13 +194,13 @@
       { date:"2026-09-09", type:"Institucional", title:"Día Nacional de los Derechos Humanos", areas:["DNPD"] },
 
       { date:"2026-10-16", type:"Institucional", title:"Día Mundial de la alimentación", areas:["DNPD","Delegada DESC","Delegada Asuntos Agrarios"] },
-      
+
       { date:"2026-11-02", type:"Institucional", title:"Cuarta Sesión Presencial del Consejo Asesor", areas:["Defensora","Vicedefensoría"] },
       { date:"2026-11-24", type:"Institucional", title:"Aniversario del Acuerdo Final para la Paz", areas:["Defensora","Vicedefensoría","DNPD"] },
 
       { date:"2026-12-01", type:"Institucional", title:"Cuarta Audiencia Defensorial", areas:["Defensora","Vicedefensoría"] },
       { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del Pacto de Derechos Civiles y Políticos", areas:["DNPD"] },
-      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del PIDESC", areas:["DNPD"] },
+      { date:"2026-12-16", type:"Institucional", title:"Aniversario 60 de la negociación del PIDESC", areas:["DNPD"] }
     ];
 
     const pad2 = (n)=> String(n).padStart(2,'0');
@@ -219,6 +220,60 @@
 
     function formatShortES(d){
       return `${pad2(d.getDate())} ${monthsEs[d.getMonth()]}`;
+    }
+
+    function buildAreasBlock(e){
+      const details = document.createElement('details');
+      details.className = 'mt-2';
+
+      const summary = document.createElement('summary');
+      summary.className = 'cursor-pointer text-sm text-slate-600 hover:text-slate-800 flex items-center gap-2';
+      summary.innerHTML = `<span class="text-slate-500">▶</span><span>Áreas responsables</span>`;
+
+      // Cambiar icono ▶/▼
+      details.addEventListener('toggle', () => {
+        const icon = summary.querySelector('span');
+        if(icon) icon.textContent = details.open ? '▼' : '▶';
+      });
+
+      const container = document.createElement('div');
+      container.className = 'mt-2 text-sm text-slate-700 space-y-1';
+
+      const areasRaw = (Array.isArray(e.areas) && e.areas.length) ? [...e.areas] : ['Por definir'];
+      const defensoraIndex = areasRaw.findIndex(a => (a||'').trim().toLowerCase() === 'defensora');
+
+      if (defensoraIndex !== -1) {
+        const lidera = document.createElement('div');
+        lidera.innerHTML = `<span style="color:var(--lila);font-weight:800">Lidera:</span> Defensora`;
+        container.appendChild(lidera);
+
+        const restantes = areasRaw.filter((_, i) => i !== defensoraIndex);
+        if (restantes.length) {
+          const coordina = document.createElement('div');
+          coordina.innerHTML = `<span style="font-weight:700">Coordina:</span> ${restantes[0]}`;
+          container.appendChild(coordina);
+
+          if (restantes.length > 1) {
+            const apoyan = document.createElement('div');
+            apoyan.innerHTML = `<span style="font-weight:700">Apoyan:</span> ${restantes.slice(1).join(', ')}`;
+            container.appendChild(apoyan);
+          }
+        }
+      } else {
+        const coordina = document.createElement('div');
+        coordina.innerHTML = `<span style="font-weight:700">Coordina:</span> ${areasRaw[0]}`;
+        container.appendChild(coordina);
+
+        if (areasRaw.length > 1) {
+          const apoyan = document.createElement('div');
+          apoyan.innerHTML = `<span style="font-weight:700">Apoyan:</span> ${areasRaw.slice(1).join(', ')}`;
+          container.appendChild(apoyan);
+        }
+      }
+
+      details.appendChild(summary);
+      details.appendChild(container);
+      return details;
     }
 
     function render(){
@@ -293,80 +348,9 @@
         title.style.overflow = 'hidden';
         title.textContent = e.title;
 
-        // Desplegable de áreas responsables
-        const details = document.createElement('details');
-details.className = 'mt-2';
-
-const summary = document.createElement('summary');
-summary.className = 'cursor-pointer text-sm text-slate-600 hover:text-slate-800';
-summary.textContent = 'Áreas responsables';
-
-const container = document.createElement('div');
-container.className = 'mt-1 text-sm space-y-1';
-
-const areas = Array.isArray(e.areas) && e.areas.length ? [...e.areas] : ["Por definir"];
-
-// Caso 1: Defensora lidera
-const defensoraIndex = areas.findIndex(a => a.toLowerCase() === 'defensora');
-
-if (defensoraIndex !== -1) {
-  const lidera = document.createElement('div');
-  lidera.innerHTML = `<strong style="color:#a855f7">Lidera:</strong> Defensora`;
-  container.appendChild(lidera);
-
-  const restantes = areas.filter((_, i) => i !== defensoraIndex);
-
-  if (restantes.length) {
-    const coordina = document.createElement('div');
-    coordina.innerHTML = `<strong>Coordina:</strong> ${restantes[0]}`;
-    container.appendChild(coordina);
-
-    if (restantes.length > 1) {
-      const apoyan = document.createElement('div');
-      apoyan.innerHTML = `<strong>Apoyan:</strong> ${restantes.slice(1).join(', ')}`;
-      container.appendChild(apoyan);
-    }
-  }
-} 
-// Caso 2: No está Defensora
-else {
-  const coordina = document.createElement('div');
-  coordina.innerHTML = `<strong>Coordina:</strong> ${areas[0]}`;
-  container.appendChild(coordina);
-
-  if (areas.length > 1) {
-    const apoyan = document.createElement('div');
-    apoyan.innerHTML = `<strong>Apoyan:</strong> ${areas.slice(1).join(', ')}`;
-    container.appendChild(apoyan);
-  }
-}
-
-details.appendChild(summary);
-details.appendChild(container);
-card.appendChild(details);
-
-        // Cambiar icono ▶/▼
-        details.addEventListener('toggle', () => {
-          const icon = summary.querySelector('span');
-          if(icon) icon.textContent = details.open ? '▼' : '▶';
-        });
-
-        const list = document.createElement('ul');
-        list.className = 'mt-1 ml-5 list-disc text-sm text-slate-700';
-
-        const areas = (Array.isArray(e.areas) && e.areas.length) ? e.areas : ["Por definir"];
-        areas.forEach(a => {
-          const li = document.createElement('li');
-          li.textContent = a;
-          list.appendChild(li);
-        });
-
-        details.appendChild(summary);
-        details.appendChild(list);
-
         card.appendChild(top);
         card.appendChild(title);
-        card.appendChild(details);
+        card.appendChild(buildAreasBlock(e));
 
         row.appendChild(dotWrap);
         row.appendChild(card);
