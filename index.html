@@ -295,11 +295,55 @@
 
         // Desplegable de áreas responsables
         const details = document.createElement('details');
-        details.className = 'mt-2';
+details.className = 'mt-2';
 
-        const summary = document.createElement('summary');
-        summary.className = 'cursor-pointer text-sm text-slate-600 hover:text-slate-800 flex items-center gap-2';
-        summary.innerHTML = `<span class="text-slate-500">▶</span><span>Áreas responsables</span>`;
+const summary = document.createElement('summary');
+summary.className = 'cursor-pointer text-sm text-slate-600 hover:text-slate-800';
+summary.textContent = 'Áreas responsables';
+
+const container = document.createElement('div');
+container.className = 'mt-1 text-sm space-y-1';
+
+const areas = Array.isArray(e.areas) && e.areas.length ? [...e.areas] : ["Por definir"];
+
+// Caso 1: Defensora lidera
+const defensoraIndex = areas.findIndex(a => a.toLowerCase() === 'defensora');
+
+if (defensoraIndex !== -1) {
+  const lidera = document.createElement('div');
+  lidera.innerHTML = `<strong style="color:#a855f7">Lidera:</strong> Defensora`;
+  container.appendChild(lidera);
+
+  const restantes = areas.filter((_, i) => i !== defensoraIndex);
+
+  if (restantes.length) {
+    const coordina = document.createElement('div');
+    coordina.innerHTML = `<strong>Coordina:</strong> ${restantes[0]}`;
+    container.appendChild(coordina);
+
+    if (restantes.length > 1) {
+      const apoyan = document.createElement('div');
+      apoyan.innerHTML = `<strong>Apoyan:</strong> ${restantes.slice(1).join(', ')}`;
+      container.appendChild(apoyan);
+    }
+  }
+} 
+// Caso 2: No está Defensora
+else {
+  const coordina = document.createElement('div');
+  coordina.innerHTML = `<strong>Coordina:</strong> ${areas[0]}`;
+  container.appendChild(coordina);
+
+  if (areas.length > 1) {
+    const apoyan = document.createElement('div');
+    apoyan.innerHTML = `<strong>Apoyan:</strong> ${areas.slice(1).join(', ')}`;
+    container.appendChild(apoyan);
+  }
+}
+
+details.appendChild(summary);
+details.appendChild(container);
+card.appendChild(details);
 
         // Cambiar icono ▶/▼
         details.addEventListener('toggle', () => {
