@@ -222,6 +222,12 @@ function updateMonthSummary(){
 
   updateMonthSummary();
 }
+    document.addEventListener('click', (ev) => {
+      const dd = document.getElementById('monthDropdown');
+      if(!dd) return;
+      if(dd.open && !dd.contains(ev.target)) dd.open = false;
+      });
+
     // Eventos 2026 (con áreas responsables)
     const events = [
       { date:"2026-01-03", type:"Institucional", title:"Aniversario 50 de la entrada en vigor del PIDESC", areas:["Vicedefensoría","DNPD"] },
