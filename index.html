@@ -105,6 +105,25 @@
       <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
         <input id="search" type="search" placeholder="Buscar (ej. CADHPAZ, Audiencia, CIDH…)"
                class="w-full sm:w-80 px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-slate-300" />
+        
+        <!-- Filtro por meses (selección múltiple) -->
+        <details id="monthDropdown" class="relative">
+          <summary class="cursor-pointer select-none text-sm px-3 py-2 rounded-xl border border-slate-300 bg-white flex items-center gap-2">
+            <span>Meses</span>
+            <span class="text-slate-500">▾</span>
+          </summary>
+          <div class="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-30">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-slate-700">Seleccionar meses</span>
+              <div class="flex gap-2">
+                <button id="btn-month-all" type="button" class="text-xs px-2 py-1 rounded-lg border border-slate-200 hover:bg-slate-50">Todos</button>
+                <button id="btn-month-none" type="button" class="text-xs px-2 py-1 rounded-lg border border-slate-200 hover:bg-slate-50">Ninguno</button>
+              </div>
+            </div>
+            <div id="monthOptions" class="grid grid-cols-3 gap-2"></div>
+            <p class="mt-2 text-[11px] text-slate-500">Tip: puedes elegir varios meses.</p>
+          </div>
+        </details>
 
         <div class="flex gap-2">
           <label class="flex items-center gap-2 text-sm px-3 py-2 rounded-xl border border-slate-300 bg-white">
