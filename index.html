@@ -352,60 +352,17 @@ function updateMonthSummary(){
     const pad2 = (n)=> String(n).padStart(2,'0');
     const parseDate = (s)=> { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
 
-   function setCenterLineSegments(filtered){
-  const line = document.getElementById('centerLine');
-  const itemsEl = document.getElementById('items');
-  if(!line || !itemsEl) return;
-
-  // limpia segmentos previos
-  line.innerHTML = '';
-
-  const totalH = itemsEl.scrollHeight || 1;
-
-  if(!filtered || filtered.length === 0){
-    line.style.background = '#e2e8f0';
-    return;
-  }
-
-  // Mes -> Y mínima (primer evento visible del mes)
-  const monthMinY = new Map();
-  filtered.forEach((e) => {
-    if(!e._rowEl) return;
-    const y = e._rowEl.offsetTop + (e._rowEl.offsetHeight / 2);
-    const m = e.d.getMonth() + 1;
-    if(!monthMinY.has(m) || y < monthMinY.get(m)) monthMinY.set(m, y);
-  });
-
-  const monthsPresent = Array.from(monthMinY.keys()).sort((a,b)=>a-b);
-  if(monthsPresent.length === 0){
-    line.style.background = '#e2e8f0';
-    return;
-  }
-
-  // Segmento mes = desde el primer evento del mes hasta el primer evento del siguiente mes
-  for(let i=0; i<monthsPresent.length; i++){
-    const m = monthsPresent[i];
-    const startY = monthMinY.get(m);
-    const nextM = monthsPresent[i+1];
-    const endY = (nextM != null) ? monthMinY.get(nextM) : totalH;
-
-    const topPct = Math.max(0, Math.min(100, (startY / totalH) * 100));
-    const bottomPct = Math.max(0, Math.min(100, (endY / totalH) * 100));
-    const heightPct = Math.max(0.5, bottomPct - topPct);
-
-    const seg = document.createElement('div');
-    seg.style.position = 'absolute';
-    seg.style.left = '0';
-    seg.style.right = '0';
-    seg.style.top = `${topPct}%`;
-    seg.style.height = `${heightPct}%`;
-    seg.style.background = monthColors[m] || '#94a3b8';
-    line.appendChild(seg);
-  }
-
-  // color de fondo por si queda hueco arriba
-  line.style.background = '#e2e8f0';
-}
+    function setCenterLineGradient(){
+      const stops = [];
+      const seg = 100/12;
+      for(let m=1; m<=12; m++){
+        const c = monthColors[m];
+        const a = (m-1)*seg;
+        const b = m*seg;
+        stops.push(`${c} ${a.toFixed(4)}%`, `${c} ${b.toFixed(4)}%`);
+      }
+      document.getElementById('centerLine').style.background = `linear-gradient(to bottom, ${stops.join(',')})`;
+    }
 
     function formatShortES(d){
       return `${pad2(d.getDate())} ${monthsEs[d.getMonth()]}`;
@@ -553,7 +510,6 @@ function updateMonthSummary(){
         row.appendChild(dotWrap);
         row.appendChild(card);
         items.appendChild(row);
-        e._rowEl = row;
       });
     }
 
